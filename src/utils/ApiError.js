@@ -12,7 +12,7 @@ class ApiError extends Error {
         this.success = false;
         this.errors = errors
 
-        // stake is exist or not
+        // stack is exist or not
         if (stack) {
             this.stack = stack
         } else {
