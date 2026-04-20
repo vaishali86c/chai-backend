@@ -7,6 +7,9 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 const generateAccessAndRefreshToken = async(userId) => {
     try {
         const user = await User.findById(userId)
+        if (!user) {
+            throw new ApiError(404, "User not found")
+        }
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
 
@@ -85,7 +88,7 @@ const registerUser = asyncHandler( async (req, res) => {
     )
 })
 
-const loginUser = asyncHandler(async (req, res) => { 
+const loginUser = asyncHandler(async (req, res) => {   
     // req body -> data
     // username or email
     // find the user
@@ -94,7 +97,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // send cookie
 
     const {username, email, password} = req.body
-    if (!username || !email) {
+    if (!(username || email)) {
         throw new ApiError(400, "username or email is required")
     }
     const user = await User.findOne({
@@ -108,9 +111,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!isPasswordValid) {
         throw new ApiError(401, "Invalid user credentials")
     }
-
     const {accessToken, refreshToken} =  await generateAccessAndRefreshToken(user._id)
-
     const loggedInUser = await User.findById(user._id).
     select("-password -refreshToken")
     
